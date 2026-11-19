@@ -66,7 +66,8 @@ contract Treasury_0903 {
         return (block.timestamp / 1 days + 4) % 7;
     }
 
-    function updateOwner(address newOwner) external onlyOwner {
+    function updateOwner(address newOwner) external {
+        require(msg.sender == owner, "not owner");
         require(newOwner != address(0), "zero");
         owner = newOwner;
     }
