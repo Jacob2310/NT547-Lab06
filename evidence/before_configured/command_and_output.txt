@@ -1,0 +1,53 @@
+COMMAND: slither AuditTarget.sol --config-file slither.config.json --fail-none --json evidence/before_configured/slither.json
+SLITHER_VERSION:
+0.11.6
+
+SOLC_VERSION:
+solc, the solidity compiler commandline interface
+Version: 0.8.24+commit.e11b9ed9.Linux.g++
+
+
+Detector: weak-prng
+Treasury_0903.weekdayIndex() (AuditTarget.sol#67-69) uses a weak PRNG: "(block.timestamp / 86400 + 4) % 7 (AuditTarget.sol#68)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG
+
+Detector: controlled-delegatecall
+Treasury_0903.plugin(address,bytes) (AuditTarget.sol#51-54) uses delegatecall to a input-controlled function id
+	- (ok,None) = target.delegatecall(data) (AuditTarget.sol#52)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall
+
+Detector: reentrancy-eth
+Reentrancy in Treasury_0903.exitSafe() (AuditTarget.sol#81-86):
+	External calls:
+	- (ok,None) = msg.sender.call{value: a}() (AuditTarget.sol#83)
+	State variables written after the call(s):
+	- parked[msg.sender] = 0 (AuditTarget.sol#85)
+	Treasury_0903.parked (AuditTarget.sol#16) can be used in cross function reentrancies:
+	- Treasury_0903.depositSafe() (AuditTarget.sol#77-79)
+	- Treasury_0903.exitSafe() (AuditTarget.sol#81-86)
+	- Treasury_0903.parked (AuditTarget.sol#16)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+Detector: unchecked-transfer
+Treasury_0903.claimTokens(uint256) (AuditTarget.sol#61-65) ignores return value by rewardToken.transfer(msg.sender,amount) (AuditTarget.sol#64)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer
+
+Detector: tx-origin
+Treasury_0903.updateOwner(address) (AuditTarget.sol#71-75) uses tx.origin for authorization: require(bool,string)(tx.origin == owner,not owner) (AuditTarget.sol#72)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-usage-of-txorigin
+
+Detector: unchecked-lowlevel
+Treasury_0903.sweep(address) (AuditTarget.sol#46-49) ignores return value by to.call{value: address(this).balance}() (AuditTarget.sol#48)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-low-level-calls
+AuditTarget.sol analyzed (2 contracts with 64 detectors), 6 result(s) found
+Multiple frameworks detected: solc, Solc-json. Using solc (highest priority). Use --compile-force-framework to override.
+'solc --version' running
+'solc AuditTarget.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/home/legion/Lab06' running
+Compilation warnings/errors on AuditTarget.sol:
+Warning: Return value of low-level calls not used.
+  --> AuditTarget.sol:48:9:
+   |
+48 |         to.call{value: address(this).balance}("");
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
