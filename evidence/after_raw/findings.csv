@@ -1,0 +1,6 @@
+﻿index,check,impact,confidence,file,lines,description
+1,events-access,Low,Medium,AuditTarget.sol,"69,70,71,72; 71",Treasury_0903.updateOwner(address) (AuditTarget.sol#69-72) should emit an event for:  	- owner = newOwner (AuditTarget.sol#71)
+2,low-level-calls,Informational,High,AuditTarget.sol,"46,47,48,49,50; 48","Low level call in Treasury_0903.sweep(address) (AuditTarget.sol#46-50): 	- (ok,None) = to.call{value: address(this).balance}() (AuditTarget.sol#48)"
+3,low-level-calls,Informational,High,AuditTarget.sol,"78,79,80,81,82,83; 81","Low level call in Treasury_0903.exitSafe() (AuditTarget.sol#78-83): 	- (ok,None) = msg.sender.call{value: a}() (AuditTarget.sol#81)"
+4,low-level-calls,Informational,High,AuditTarget.sol,"41,42,43,44; 42","Low level call in Treasury_0903.ownerWithdraw(uint256) (AuditTarget.sol#41-44): 	- (ok,None) = address(owner).call{value: amount}() (AuditTarget.sol#42)"
+5,naming-convention,Informational,High,AuditTarget.sol,"10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84",Contract Treasury_0903 (AuditTarget.sol#10-84) is not in CapWords

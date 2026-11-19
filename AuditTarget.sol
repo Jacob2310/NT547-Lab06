@@ -45,12 +45,8 @@ contract Treasury_0903 {
 
     function sweep(address payable to) external onlyOwner {
         require(to != address(0), "zero");
-        to.call{value: address(this).balance}("");
-    }
-
-    function plugin(address target, bytes calldata data) external {
-        (bool ok, ) = target.delegatecall(data);
-        require(ok, "delegatecall failed");
+        (bool ok, ) = to.call{value: address(this).balance}("");
+        require(ok, "sweep failed");
     }
 
     function setPayToken(address t) external onlyOwner {
@@ -61,15 +57,16 @@ contract Treasury_0903 {
     function claimTokens(uint256 amount) external {
         require(tokenCredit[msg.sender] >= amount, "not enough");
         tokenCredit[msg.sender] -= amount;
-        rewardToken.transfer(msg.sender, amount);
+        require(rewardToken.transfer(msg.sender, amount), "transfer failed");
     }
 
     function weekdayIndex() external view returns (uint256) {
+        // Chi de HIEN THI ngay trong tuan; khong dung lam ngau nhien, tien hay quyen.
+        // slither-disable-next-line weak-prng
         return (block.timestamp / 1 days + 4) % 7;
     }
 
-    function updateOwner(address newOwner) external {
-        require(tx.origin == owner, "not owner");
+    function updateOwner(address newOwner) external onlyOwner {
         require(newOwner != address(0), "zero");
         owner = newOwner;
     }
@@ -80,8 +77,8 @@ contract Treasury_0903 {
 
     function exitSafe() external exclusive {
         uint256 a = parked[msg.sender];
+        parked[msg.sender] = 0;
         (bool ok, ) = msg.sender.call{value: a}("");
         require(ok, "send failed");
-        parked[msg.sender] = 0;
     }
 }
